@@ -1,0 +1,65 @@
+---
+title: "LDA Topic Time Trends"
+output: html_notebook
+---
+
+Time series visualization of topic trends: 
+
+```{r}
+df <- read.csv(file = "timed_tweets.csv")
+```
+
+```{r}
+head(df)
+```
+
+```{r}
+Month <- substr(df$X,start = 5,7)
+Day <- substr(df$X, start = 9,10)
+Year <- rep(x = "2017", times = length(Month))
+DateVar <- paste(Month, Day, Year, sep = "/")
+asDateVar <-  as.Date(DateVar, format = "%b/%d/%Y")
+```
+
+```{r}
+library(plyr)
+df$time <- asDateVar
+df2 <- ddply(df, "time", summarise,
+      Nuclear=sum(Nuclear),
+      Professor_Crime = sum(Professor_Crime),
+      Thaler_Nobel = sum(Thaler_Nobel),
+      Cancer_Research = sum(Cancer_Research),
+      Unionization = sum(Unionization),
+      Evening_Program = sum(Evening_Program),
+      Zimmer_FreeSpeech = sum(Zimmer_FreeSpeech))
+      
+```
+
+```{r}
+df2[,2:8]
+df2$Total <- rowSums(df2[,2:8])
+```
+
+```{r}
+df2[,2:8] <-sweep(df2[,2:8], 2, df2[,9], "/")
+```
+
+```{r}
+library(ggplot2)
+ggplot(df2) + geom_line(mapping = aes(x=time, y = Thaler_Nobel))
+```
+
+```{r}
+ggplot(df2) + geom_line(mapping = aes(x=time, y = Unionization))
+```
+
+```{r}
+ggplot(df2) + geom_line(mapping = aes(x=time, y = Zimmer_FreeSpeech))
+```
+
+
+
+
+
+
+
